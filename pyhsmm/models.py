@@ -872,6 +872,47 @@ class WeakLimitStickyHDPHMM(WeakLimitHDPHMM):
         super(WeakLimitStickyHDPHMM,self).__init__(
                 obs_distns=obs_distns,trans_distn=trans_distn,**kwargs)
 
+######################
+#  Stateful HDP HMM  #
+######################
+
+
+class WeakLimitStatefulHDPHMM(WeakLimitHDPHMM):
+    """
+    The stateful HDP-HMM by Dhir et al. (2016).
+    """
+    def __init__(self,
+                 obs_distns,
+                 kappa=None,
+                 alpha=None,
+                 gamma=None,
+                 trans_matrix=None,
+                 alpha_a_0=None,
+                 alpha_b_0=None,
+                 gamma_a_0=None,
+                 gamma_b_0=None,
+                 **kwargs):
+    assert (None not in (alpha,gamma)) ^ \
+    (None not in (alpha_a_0,alpha_b_0,gamma_a_0,gamma_b_0))
+    if None not in (alpha,gamma):
+        trans_distn = transitions.WeakLimitStickyHDPHMMTransitions(num_states=len(obs_distns),
+                                                                   kappa=kappa,
+                                                                   alpha=alpha,
+                                                                   gamma=gamma,
+                                                                   trans_matrix=trans_matrix)
+    else:
+        trans_distn = transitions.WeakLimitStickyHDPHMMTransitionsConc(num_states=len(obs_distns),
+                                                                       kappa=kappa,
+                                                                       alpha_a_0=alpha_a_0,
+                                                                       alpha_b_0=alpha_b_0,
+                                                                       gamma_a_0=gamma_a_0,
+                                                                       gamma_b_0=gamma_b_0,
+                                                                       trans_matrix=trans_matrix)
+        super(WeakLimitStatefulHDPHMM,self).__init__(obs_distns=obs_distns,
+                                                     trans_distn=trans_distn,
+                                                     **kwargs)
+        # self: super() lets you avoid referring to the base class explicitly, which can be nice. 
+        # But the main advantage comes with multiple inheritance, where all sorts of fun stuff can happen.
 
 class HMMPossibleChangepoints(_HMMPossibleChangepointsMixin,HMM):
     pass

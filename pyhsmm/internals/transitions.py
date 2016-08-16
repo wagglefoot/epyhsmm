@@ -435,6 +435,57 @@ class WeakLimitStickyHDPHMMTransitionsConc(
         _WeakLimitStickyHDPHMMTransitionsConcGibbs):
     pass
 
+#------------------------------------------------------------#
+#                   Start: Stateful HDP HMM                  #
+#------------------------------------------------------------#
+
+# class _Internal:
+#   ...
+# self: This is the official Python convention for 'internal'
+# symbols; "from module import *" does not import underscore-prefixed objects.
+
+class _WeakLimitStatefulHDPHMMTransitionsBase(_WeakLimitHDPHMMTransitionsBase):
+    def __init__(self,kappa,**kwargs):
+        self.kappa = kappa
+        super(_WeakLimitStatefulHDPHMMTransitionsBase,self).__init__(**kwargs)
+
+class _WeakLimitStatefulHDPHMMTransitionsGibbs(_WeakLimitStatefulHDPHMMTransitionsBase,
+                                               _WeakLimitHDPHMMTransitionsGibbs):
+    def _set_alphav(self,weights):
+        for distn, delta_ij in zip(self._row_distns,np.eye(self.N)):
+            distn.alphav_0 = weights + self.kappa * delta_ij
+
+    alphav = property(_WeakLimitHDPHMMTransitionsGibbs.alphav.fget,_set_alphav)
+
+    def _get_m(self,trans_counts):
+        # NOTE: this thins the m's
+        ms = super(_WeakLimitStatefulHDPHMMTransitionsGibbs,self)._get_m(trans_counts)
+        newms = ms.copy()
+        if ms.sum() > 0:
+            # np.random.binomial fails when n=0, so pull out nonzero indices
+            indices = np.nonzero(newms.flat[::ms.shape[0]+1])
+            newms.flat[::ms.shape[0]+1][indices] = np.array(np.random.binomial(
+                    ms.flat[::ms.shape[0]+1][indices],
+                    self.beta[indices]*self.alpha/(self.beta[indices]*self.alpha + self.kappa)),
+                    dtype=np.int32)
+        return newms
+
+class _WeakLimitStatefulHDPHMMTransitionsConcGibbs(_WeakLimitStatefulHDPHMMTransitionsGibbs,
+                                                   _WeakLimitHDPHMMTransitionsConcGibbs):
+    pass
+
+class WeakLimitStatefulHDPHMMTransitions(_WeakLimitStatefulHDPHMMTransitionsGibbs,
+                                         _HMMTransitionsMaxLikelihood):
+# NOTE: includes MaxLikelihood for convenience
+    pass
+
+class WeakLimitStatefulHDPHMMTransitionsConc(_WeakLimitStatefulHDPHMMTransitionsConcGibbs):
+    pass
+
+#------------------------------------------------------------#
+#                   End: Stateful HDP HMM                    #
+#------------------------------------------------------------#
+
 # DA Truncation
 
 class _DATruncHDPHMMTransitionsBase(_HMMTransitionsBase):
