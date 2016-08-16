@@ -892,22 +892,22 @@ class WeakLimitStatefulHDPHMM(WeakLimitHDPHMM):
                  gamma_a_0=None,
                  gamma_b_0=None,
                  **kwargs):
-    assert (None not in (alpha,gamma)) ^ \
-    (None not in (alpha_a_0,alpha_b_0,gamma_a_0,gamma_b_0))
-    if None not in (alpha,gamma):
-        trans_distn = transitions.WeakLimitStickyHDPHMMTransitions(num_states=len(obs_distns),
-                                                                   kappa=kappa,
-                                                                   alpha=alpha,
-                                                                   gamma=gamma,
-                                                                   trans_matrix=trans_matrix)
-    else:
-        trans_distn = transitions.WeakLimitStickyHDPHMMTransitionsConc(num_states=len(obs_distns),
+        assert (None not in (alpha,gamma)) ^ \
+                (None not in (alpha_a_0,alpha_b_0,gamma_a_0,gamma_b_0))
+        if None not in (alpha,gamma):
+            trans_distn = transitions.WeakLimitStickyHDPHMMTransitions(num_states=len(obs_distns),
                                                                        kappa=kappa,
-                                                                       alpha_a_0=alpha_a_0,
-                                                                       alpha_b_0=alpha_b_0,
-                                                                       gamma_a_0=gamma_a_0,
-                                                                       gamma_b_0=gamma_b_0,
+                                                                       alpha=alpha,
+                                                                       gamma=gamma,
                                                                        trans_matrix=trans_matrix)
+        else:
+            trans_distn = transitions.WeakLimitStickyHDPHMMTransitionsConc(num_states=len(obs_distns),
+                                                                           kappa=kappa,
+                                                                           alpha_a_0=alpha_a_0,
+                                                                           alpha_b_0=alpha_b_0,
+                                                                           gamma_a_0=gamma_a_0,
+                                                                           gamma_b_0=gamma_b_0,
+                                                                           trans_matrix=trans_matrix)
         super(WeakLimitStatefulHDPHMM,self).__init__(obs_distns=obs_distns,
                                                      trans_distn=trans_distn,
                                                      **kwargs)
