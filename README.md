@@ -1,6 +1,8 @@
 [![Build
 Status](https://travis-ci.org/mattjj/pyhsmm.svg?branch=master)](https://travis-ci.org/mattjj/pyhsmm)
 
+This is an extensions of the pyhsmm module with the stateful HDP-HMM of Dhir et al. (2016).
+
 # Bayesian inference in HSMMs and HMMs #
 
 This is a Python library for approximate unsupervised inference in
